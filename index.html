@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz para Pais</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
+body{background:#e6f0f5;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px}
+.quiz{max-width:700px;width:100%;background:#fff;border-radius:32px;box-shadow:0 20px 40px rgba(0,35,60,.2);padding:32px 24px}
+h1{font-size:1.8rem;color:#0b2a3b;margin-bottom:8px}
+h1 span{color:#1e6f9f}
+.sub{color:#3b5e73;margin-bottom:24px;font-size:.95rem}
+.prog-info{display:flex;justify-content:space-between;color:#2b4d61;font-size:.9rem;margin-bottom:8px;font-weight:bold}
+.prog-bg{width:100%;height:10px;background:#d9e7f0;border-radius:20px;overflow:hidden;margin-bottom:24px}
+.prog-fill{height:100%;width:0;background:linear-gradient(90deg,#1e6f9f,#2e9e6b);transition:width .3s}
+.pergunta{font-size:1.5rem;font-weight:bold;color:#0c3a4f;margin-bottom:12px;line-height:1.3}
+.dica{color:#4d7186;font-size:.95rem;margin-bottom:20px;border-left:4px solid #2e9e6b;padding-left:12px;font-style:italic}
+.opcao{background:#fff;border:2px solid #cde3ee;padding:16px 20px;border-radius:20px;font-size:1.1rem;color:#12384b;margin-bottom:12px;cursor:pointer;display:flex;align-items:center;gap:14px;transition:all .15s}
+.opcao:hover{background:#e7f2f9;border-color:#1e6f9f}
+.opcao.sel{background:#d7edfa;border-color:#1e6f9f}
+.letra{background:#cde3ee;width:36px;height:36px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:bold;color:#1e6f9f;flex-shrink:0}
+.opcao.sel .letra{background:#1e6f9f;color:#fff}
+.botoes{display:flex;gap:12px;margin-top:24px}
+.btn{padding:16px 24px;border-radius:50px;border:none;font-weight:bold;font-size:1rem;cursor:pointer;flex:1;transition:all .2s}
+.btn-p{background:#1e6f9f;color:#fff}
+.btn-p:disabled{opacity:.4;cursor:not-allowed}
+.btn-s{background:#fff;color:#1e6f9f;border:2px solid #cde3ee}
+.btn-s:disabled{opacity:.4;cursor:not-allowed}
+.res{text-align:center;padding:16px}
+.res-emoji{font-size:4rem;margin-bottom:12px}
+.res-tit{font-size:1.9rem;font-weight:bold;color:#0b2a3b;margin-bottom:16px}
+.res-txt{font-size:1.1rem;color:#2d5268;background:#eef6fb;padding:20px;border-radius:20px;margin-bottom:20px;line-height:1.6;text-align:left}
+.res-txt strong{color:#1e6f9f}
+.rec{display:flex;gap:12px;background:#f9fdfe;padding:14px 18px;border-radius:16px;border-left:5px solid #2e9e6b;margin-bottom:12px;text-align:left}
+.rec-ico{font-size:1.5rem}
+.rec p{color:#153e52;font-size:.95rem;line-height:1.4}
+.rec strong{color:#0b2a3b}
+.oculto{display:none}
+</style>
+</head>
+<body>
+<div class="quiz">
+<h1>Conhecendo <span>seu Filho</span></h1>
+<p class="sub">💙 Quiz educativo para pais</p>
+
+<div id="quiz">
+<div class="prog-info"><span id="ptxt">Pergunta 1 de 6</span><span id="ppct">0%</span></div>
+<div class="prog-bg"><div class="prog-fill" id="pfill"></div></div>
+<div class="pergunta" id="pergunta">Carregando...</div>
+<div class="dica" id="dica"></div>
+<div id="opcoes"></div>
+<div class="botoes">
+<button class="btn btn-s" id="btnAnt" disabled>← Anterior</button>
+<button class="btn btn-p" id="btnProx" disabled>Próxima →</button>
+</div>
+</div>
+
+<div id="resultado" class="oculto res">
+<div class="res-emoji" id="rEmoji">🌟</div>
+<div class="res-tit" id="rTit"></div>
+<div class="res-txt" id="rTxt"></div>
+<div id="rRec"></div>
+<button class="btn btn-p" id="btnRef" style="width:100%;margin-top:16px">🔄 Refazer o Quiz</button>
+</div>
+
+<p style="text-align:center;font-size:.8rem;color:#6a8b9f;margin-top:20px;border-top:1px solid #d0e2ee;padding-top:16px">💡 Cada criança é única — este quiz é uma ferramenta de reflexão.</p>
+</div>
+
+<script>
+var perguntas=[
+{texto:"Seu filho é interativo?",dica:"Pense na facilidade em se comunicar e brincar com outros.",opcoes:[{t:"Sim, muito sociável",v:3,e:"😊"},{t:"Às vezes, depende",v:2,e:"😐"},{t:"Prefere ficar sozinho",v:1,e:"🤔"}]},
+{texto:"Como reage a novas atividades?",dica:"Observe a curiosidade e abertura.",opcoes:[{t:"Adora novidades",v:3,e:"🚀"},{t:"Precisa de tempo",v:2,e:"⏳"},{t:"Prefere rotina",v:1,e:"🔁"}]},
+{texto:"Demonstra empatia?",dica:"Perceber e ajudar os outros.",opcoes:[{t:"Sim, muito atencioso",v:3,e:"❤️"},{t:"Em algumas situações",v:2,e:"🤝"},{t:"Tem dificuldade",v:1,e:"😶"}]},
+{texto:"Como é a concentração?",dica:"Considere a idade e o contexto.",opcoes:[{t:"Foca bastante tempo",v:3,e:"🎯"},{t:"Distrai mas retoma",v:2,e:"🌀"},{t:"Muito disperso",v:1,e:"🌪️"}]},
+{texto:"Expressa emoções com clareza?",dica:"Consegue dizer o que sente?",opcoes:[{t:"Sim, verbaliza bem",v:3,e:"🗣️"},{t:"Às vezes",v:2,e:"🤔"},{t:"Guarda ou explode",v:1,e:"🌋"}]},
+{texto:"Tem autonomia em tarefas?",dica:"Se vestir, organizar, escovar dentes...",opcoes:[{t:"Sim, faz sozinho",v:3,e:"🧒"},{t:"Precisa de supervisão",v:2,e:"👀"},{t:"Depende de adultos",v:1,e:"🆘"}]}
+];
+var idx=0,resp=[],sel=[];
+for(var i=0;i<6;i++){resp.push(null);sel.push(null);}
+
+var elQ=document.getElementById('quiz'),elR=document.getElementById('resultado');
+var elP=document.getElementById('pergunta'),elD=document.getElementById('dica');
+var elO=document.getElementById('opcoes'),elAnt=document.getElementById('btnAnt');
+var elProx=document.getElementById('btnProx'),elTxt=document.getElementById('ptxt');
+var elPct=document.getElementById('ppct'),elFill=document.getElementById('pfill');
+
+function carregar(){
+var p=perguntas[idx];
+elP.innerHTML="❓ "+p.texto;
+elD.textContent=p.dica;
+elO.innerHTML="";
+for(var i=0;i<p.opcoes.length;i++){
+(function(i){
+var o=p.opcoes[i];
+var d=document.createElement('div');
+d.className='opcao'+(sel[idx]===i?' sel':'');
+d.innerHTML='<div class="letra">'+String.fromCharCode(65+i)+'</div><span>'+o.e+' '+o.t+'</span>';
+d.onclick=function(){selecionar(i,o.v);};
+elO.appendChild(d);
+})(i);
+}
+elAnt.disabled=(idx===0);
+elProx.disabled=(sel[idx]===null);
+elProx.innerHTML=(idx===perguntas.length-1)?'Finalizar ✅':'Próxima →';
+elTxt.textContent='Pergunta '+(idx+1)+' de '+perguntas.length;
+var pct=Math.round(((idx+1)/perguntas.length)*100);
+elPct.textContent=pct+'%';
+elFill.style.width=pct+'%';
+}
+
+function selecionar(i,v){
+var op=document.querySelectorAll('.opcao');
+for(var j=0;j<op.length;j++)op[j].classList.remove('sel');
+op[i].classList.add('sel');
+sel[idx]=i;resp[idx]=v;
+elProx.disabled=false;
+}
+
+function proxima(){
+if(sel[idx]===null)return;
+if(idx===perguntas.length-1){mostrarResultado();return;}
+idx++;carregar();
+}
+
+function anterior(){if(idx>0){idx--;carregar();}}
+
+function mostrarResultado(){
+elQ.classList.add('oculto');
+elR.classList.remove('oculto');
+var soma=0;
+for(var i=0;i<resp.length;i++)soma+=(resp[i]||0);
+var max=perguntas.length*3;
+var pct=(soma/max)*100;
+var r;
+if(pct>=75){
+r={e:"🌟",t:"Filho sociável e comunicativo",x:"Seu filho demonstra <strong>grande interatividade</strong>, empatia e autonomia. Continue incentivando essa abertura!",rec:[{i:"👥",t:"Estímulo social",d:"Proporcione encontros com outras crianças."},{i:"📖",t:"Leitura e conversa",d:"Leia junto e fale sobre emoções."},{i:"🧩",t:"Desafios",d:"Ofereça tarefas que exijam cooperação."}]};
+}else if(pct>=45){
+r={e:"🌱",t:"Desenvolvimento equilibrado",x:"Seu filho tem <strong>habilidades importantes</strong>, mas pode precisar de apoio em algumas áreas.",rec:[{i:"💗",t:"Apoio emocional",d:"Ajude-o a nomear sentimentos."},{i:"⏰",t:"Rotinas flexíveis",d:"Respeite o ritmo da criança."},{i:"🎮",t:"Brincadeiras dirigidas",d:"Use jogos cooperativos."}]};
+}else{
+r={e:"🛡️",t:"Filho reservado que precisa de suporte",x:"Seu filho parece ser <strong>mais introspectivo</strong>. Ofereça apoio com paciência e afeto.",rec:[{i:"❤️",t:"Acolhimento sem pressão",d:"Respeite o tempo dele."},{i:"💬",t:"Comunicação alternativa",d:"Use desenhos e histórias."},{i:"👫",t:"Pequenos grupos",d:"Prefira 1 ou 2 crianças."}]};
+}
+document.getElementById('rEmoji').textContent=r.e;
+document.getElementById('rTit').textContent=r.t;
+document.getElementById('rTxt').innerHTML=r.x;
+var rec=document.getElementById('rRec');
+rec.innerHTML='';
+for(var i=0;i<r.rec.length;i++){
+var d=document.createElement('div');
+d.className='rec';
+d.innerHTML='<div class="rec-ico">'+r.rec[i].i+'</div><p><strong>'+r.rec[i].t+':</strong> '+r.rec[i].d+'</p>';
+rec.appendChild(d);
+}
+}
+
+function refazer(){
+idx=0;
+for(var i=0;i<6;i++){resp[i]=null;sel[i]=null;}
+elR.classList.add('oculto');
+elQ.classList.remove('oculto');
+carregar();
+}
+
+elProx.onclick=proxima;
+elAnt.onclick=anterior;
+document.getElementById('btnRef').onclick=refazer;
+carregar();
+</script>
+</body>
+</html>
